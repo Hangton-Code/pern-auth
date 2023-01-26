@@ -20,14 +20,14 @@ function SignupPage() {
   const [userName, setUserName] = useState("");
   const userNameError = useMemo(() => {
     if (userName.length < 6 || userName.length > 30) {
-      return "*must contain 6 to 30 characters";
+      return "*must contain more than 6 characters";
     }
     return "";
   }, [userName]);
   const [password, setPassword] = useState("");
   const passwordError = useMemo(() => {
     if (password.length < 8 || password.length > 30) {
-      return "*must contain 8 to 30 characters";
+      return "*must contain more than 8 characters";
     }
     return "";
   }, [password]);
@@ -46,7 +46,7 @@ function SignupPage() {
     });
   };
 
-  if (!token || email === "false") return <Navigate to="/" />;
+  if (!token || email === "false") return <Navigate to="" />;
 
   return (
     <div className="bg-white w-full h-full flex items-center justify-center p-[6%]">
@@ -104,6 +104,7 @@ function SignupPage() {
             placeholder="Enter a user name"
             className="text-slate-500 border-2 border-slate-300 focus:border-purple-600 transition-all rounded-lg py-2 px-3 outline-none w-full"
             autoComplete="off"
+            maxLength={30}
           />
         </div>
 
@@ -127,6 +128,7 @@ function SignupPage() {
             placeholder="Enter a password"
             className="text-slate-500 border-2 border-slate-300 focus:border-purple-600 transition-all rounded-lg py-2 px-3 outline-none w-full"
             autoComplete="off"
+            maxLength={30}
           />
           {error ? (
             <div className="text-sm font-medium text-red-500 indent-2">
@@ -162,13 +164,9 @@ function SignupPage() {
         {/* button */}
         <button
           type="submit"
-          className="hover:cursor-pointer h-10 px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:shadow-purple-300 hover:shadow-md transition-all active:scale-95 disabled:pointer-events-none disabled:opacity-60 flex justify-center"
+          className="active:shadow-none hover:cursor-pointer h-10 px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:shadow-purple-300 hover:shadow-md transition-all active:scale-95 disabled:pointer-events-none disabled:opacity-60 flex justify-center"
           disabled={
-            !!userNameError ||
-            !!passwordError ||
-            !!error ||
-            !isPolicyAgreed ||
-            isLoading
+            !!userNameError || !!passwordError || !isPolicyAgreed || isLoading
           }
         >
           {isLoading ? (

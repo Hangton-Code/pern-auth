@@ -6,9 +6,8 @@ import {
   useCallback,
   useContext,
 } from "react";
-import { IUser } from "./type";
+import { IUser, UserAvatarType } from "./type";
 import axios, { RawAxiosRequestConfig } from "axios";
-import { useNavigate, useLocation } from "react-router-dom";
 
 const UserContext = createContext({
   user: {} as IUser,
@@ -39,6 +38,18 @@ const AuthContext = createContext({
   ): Promise<string | null> => {
     return null;
   },
+  setPasswordEmail: async (_email?: string): Promise<string | null> => {
+    return null;
+  },
+  setPassword: async (
+    password: string,
+    token: string
+  ): Promise<string | null> => {
+    return null;
+  },
+  logout: async (): Promise<string | null> => {
+    return null;
+  },
 });
 
 const useAuth = () => useContext(AuthContext);
@@ -59,6 +70,25 @@ function getAccessToken(refresh_token: string) {
     .catch(() => null);
 }
 
+const ProfileContext = createContext({
+  editProfile: async (
+    payload: {
+      user_name?: string;
+    },
+    access_token?: string
+  ): Promise<string | null> => {
+    return null;
+  },
+  editAvatar: async (
+    avatarType: UserAvatarType,
+    avatarContent: File | string | null
+  ): Promise<string | null> => {
+    return null;
+  },
+});
+
+const useProfile = () => useContext(ProfileContext);
+
 function AuthProvider({ children }: AuthProviderProp) {
   const [user, setUser] = useState({} as IUser);
   const [refreshToken, setRefreshToken] = useState(
@@ -66,8 +96,6 @@ function AuthProvider({ children }: AuthProviderProp) {
   );
   const [accessToken, setAccessToken] = useState("");
   const [isReady, setIsReady] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
 
   // return value refer to api response, which mean null refer to error occur
   const callProtectedAPI = useCallback(
@@ -124,6 +152,35 @@ function AuthProvider({ children }: AuthProviderProp) {
     },
     [accessToken, refreshToken]
   );
+
+  // init
+  useEffect(() => {
+    (async () => {
+      if (refreshToken) {
+        const access_token = await getAccessToken(refreshToken);
+
+        if (access_token) {
+          // if refresh_token is valid
+          setAccessToken(access_token);
+          const res = await callProtectedAPI(
+            {
+              url: `${process.env.REACT_APP_SERVER_URL}/auth/me`,
+              method: "GET",
+            },
+            access_token
+          );
+          if (!res.error) setUser(res.body.user);
+        } else {
+          // if refresh_token is invalid, delete the invalid refresh_token
+          localStorage.removeItem("refresh_token");
+          setRefreshToken("");
+        }
+      }
+      setIsReady(true);
+    })();
+  }, []);
+
+  //  ------------- auth -------------
 
   // login function
   const login = useCallback(async (email: string, password: string) => {
@@ -182,7 +239,7 @@ function AuthProvider({ children }: AuthProviderProp) {
   // signup
   const signup = useCallback(
     async (userName: string, password: string, token: string) => {
-      let res = await axios({
+      const res = await axios({
         url: `${process.env.REACT_APP_SERVER_URL}/auth/signup`,
         method: "POST",
         data: {
@@ -195,11 +252,11 @@ function AuthProvider({ children }: AuthProviderProp) {
 
       if (res.error) return res.message as string;
 
-      const user = res.body.user;
+      const _user = res.body.user;
       const refresh_token = res.body.refresh_token;
       const access_token = res.body.access_token;
 
-      res = await callProtectedAPI(
+      await callProtectedAPI(
         {
           url: `${process.env.REACT_APP_SERVER_URL}/profile/edit`,
           method: "POST",
@@ -211,70 +268,136 @@ function AuthProvider({ children }: AuthProviderProp) {
       );
 
       setUser({
-        ...user,
+        ..._user,
         user_name: userName,
       });
       setAccessToken(access_token);
       localStorage.setItem("refresh_token", refresh_token);
       setRefreshToken(refresh_token);
 
-      return res.error ? (res.message as string) : null;
+      return null;
     },
-    []
+    [callProtectedAPI]
   );
 
-  // init
-  useEffect(() => {
-    (async () => {
-      if (refreshToken) {
-        const access_token = await getAccessToken(refreshToken);
+  // set password email
+  const setPasswordEmail = useCallback(
+    async (_email?: string) => {
+      const requested_email = _email || user.email;
 
-        if (access_token) {
-          // if refresh_token is valid
-          setAccessToken(access_token);
-          const res = await callProtectedAPI(
-            {
-              url: `${process.env.REACT_APP_SERVER_URL}/auth/me`,
-              method: "GET",
-            },
-            access_token
-          );
-          if (!res.error) setUser(res.body.user);
-        } else {
-          // if refresh_token is invalid, delete the invalid refresh_token
-          localStorage.removeItem("refresh_token");
-          setRefreshToken("");
-        }
-      }
-      setIsReady(true);
-    })();
+      const res = await axios({
+        url: `${process.env.REACT_APP_SERVER_URL}/auth/set_password_email`,
+        method: "POST",
+        data: {
+          email: requested_email,
+        },
+      })
+        .then((res) => res.data)
+        .catch((err) => err.response.data);
+
+      // null refer to no error
+      return res.error ? (res.message as string) : null;
+    },
+    [user.email]
+  );
+
+  // set password
+  const setPassword = useCallback(async (password: string, token: string) => {
+    const res = await axios({
+      url: `${process.env.REACT_APP_SERVER_URL}/auth/set_password`,
+      method: "POST",
+      data: {
+        token,
+        password,
+      },
+    })
+      .then((res) => res.data)
+      .catch((err) => err.response.data);
+
+    // null refer to no error
+    return res.error ? (res.message as string) : null;
   }, []);
 
-  // listen to user state and redirect
-  useEffect(() => {
-    const routeForAuthedUser = ["/"];
-    // redirect unauthed user
-    if (
-      isReady &&
-      !refreshToken &&
-      routeForAuthedUser.includes(location.pathname)
-    )
-      navigate("/auth/credentials/login");
+  // logout
+  const logout = useCallback(async () => {
+    const res = await axios({
+      url: `${process.env.REACT_APP_SERVER_URL}/auth/logout`,
+      method: "POST",
+      data: {
+        refresh_token: refreshToken,
+      },
+    })
+      .then((res) => res.data)
+      .catch((err) => err.response.data);
 
-    // redirect logined user
-    const routeForUnauthedUser = [
-      "/auth/credentials/login",
-      "/auth/credentials/signup_email",
-      "/auth/credentials/signup",
-      "/auth/credentials/forget_password",
-    ];
-    if (
-      isReady &&
-      refreshToken &&
-      routeForUnauthedUser.includes(location.pathname)
-    )
-      navigate("/");
-  }, [isReady, refreshToken]);
+    if (res.error) return res.message as string;
+
+    setAccessToken("");
+    localStorage.removeItem("refresh_token");
+    setRefreshToken("");
+    setUser({} as IUser);
+
+    return null;
+  }, [refreshToken]);
+
+  // ------------- profile -------------
+
+  // edit profile
+  const editProfile = useCallback(
+    async (payload: { user_name?: string }) => {
+      const res = await callProtectedAPI({
+        url: `${process.env.REACT_APP_SERVER_URL}/profile/edit`,
+        method: "POST",
+        data: payload,
+      });
+      if (!res.error) {
+        setUser((prev) => {
+          return {
+            ...prev,
+            ...payload,
+          };
+        });
+        return null;
+      }
+      return res.message as string;
+    },
+    [callProtectedAPI]
+  );
+
+  // edit avatar
+  const editAvatar = useCallback(
+    async (avatarType: UserAvatarType, avatarContent: File | string | null) => {
+      const data = new FormData();
+      data.append("avatar_type", String(avatarType));
+      switch (avatarType) {
+        case UserAvatarType.UPLOADED_IMAGE:
+          data.append("image", avatarContent as File);
+          break;
+        case UserAvatarType.URL:
+          data.append("avatar_url", avatarContent as string);
+          break;
+        default:
+          break;
+      }
+
+      const res = await callProtectedAPI({
+        url: `${process.env.REACT_APP_SERVER_URL}/profile/edit/avatar`,
+        method: "POST",
+        data: data,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      if (!res.error) {
+        setUser({
+          ...user,
+          user_avatar_type: res.body.new_user_avatar_type,
+          user_avatar_content: res.body.new_user_avatar_content,
+        });
+        return null;
+      }
+      return res.message as string;
+    },
+    [callProtectedAPI, user]
+  );
 
   return (
     <UserContext.Provider
@@ -285,12 +408,24 @@ function AuthProvider({ children }: AuthProviderProp) {
         isReady,
       }}
     >
-      <AuthContext.Provider value={{ login, googleLogin, signupEmail, signup }}>
-        {children}
+      <AuthContext.Provider
+        value={{
+          login,
+          googleLogin,
+          signupEmail,
+          signup,
+          setPasswordEmail,
+          setPassword,
+          logout,
+        }}
+      >
+        <ProfileContext.Provider value={{ editProfile, editAvatar }}>
+          {children}
+        </ProfileContext.Provider>
       </AuthContext.Provider>
     </UserContext.Provider>
   );
 }
 
 export default AuthProvider;
-export { useUser, useAuth };
+export { useUser, useAuth, useProfile };

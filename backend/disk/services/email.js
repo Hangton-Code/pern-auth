@@ -4,28 +4,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendSetPasswordEmail = exports.sendSignUpEmail = void 0;
-const mail_1 = __importDefault(require("@sendgrid/mail"));
-require("dotenv").config();
-mail_1.default.setApiKey(process.env.SENDGRID_API_KEY);
+const nodemailer_1 = __importDefault(require("../nodemailer"));
 function sendSignUpEmail(email, redirect_url) {
     const message = {
+        from: process.env.NODEMAILER_OUTLOOK_EMAIL,
         to: email,
-        from: process.env.SENDGRID_API_EMAIL,
         subject: "Welcome to Code-Hangton!",
-        text: "Thank You For Signing Up",
-        html: `<h1>Hello User, welcome to Code-Hangton. <a href="${redirect_url}">Click here</a> to continue the registration.</h1>`,
+        text: `Thank you for signing up. Link to continue the registration: ${redirect_url}`,
+        html: `<h1>Hello User, welcome to PERN-AUTH. <a href="${redirect_url}">Click here</a> to continue the registration.</h1>`,
     };
-    return mail_1.default.send(message);
+    return nodemailer_1.default.sendMail(message);
 }
 exports.sendSignUpEmail = sendSignUpEmail;
 function sendSetPasswordEmail(email, redirect_url) {
     const message = {
+        from: process.env.NODEMAILER_OUTLOOK_EMAIL,
         to: email,
-        from: process.env.SENDGRID_API_EMAIL,
-        subject: "Reset Your Password Here!",
-        text: "Thank You For Coming Back",
-        html: `<h1>Hello User, welcome back to Code-Hangton. <a href="${redirect_url}">Click here</a> to reset your password.</h1>`,
+        subject: "Set Your New Password Here!",
+        text: `Thank you for using PERN-AUTH. Link to set up your new password: ${redirect_url}`,
+        html: `<h1>Hello User, welcome back to PERN-AUTH. <a href="${redirect_url}">Click here</a> to reset your password.</h1>`,
     };
-    return mail_1.default.send(message);
+    return nodemailer_1.default.sendMail(message);
 }
 exports.sendSetPasswordEmail = sendSetPasswordEmail;

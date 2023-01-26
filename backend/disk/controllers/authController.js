@@ -55,7 +55,7 @@ function loginController(req, res) {
         res.json({
             message: "success",
             body: {
-                user,
+                user: Object.assign(Object.assign({}, user), { password: null }),
                 refresh_token,
                 access_token,
             },
@@ -115,7 +115,7 @@ function signupController(req, res) {
         res.json({
             message: "success",
             body: {
-                user,
+                user: Object.assign(Object.assign({}, user), { password: null }),
                 refresh_token,
                 access_token,
             },
@@ -186,6 +186,7 @@ function setPasswordEmailController(req, res) {
             });
         const token = (0, jwt_1.signToken)({
             id: user.id,
+            email,
         }, process.env.JWT_TOKEN_SECRET_KEY, { expiresIn: "8d" });
         const redirect_url = `${process.env.CLIENT_URL}/auth/credentials/set_password?token=${token}`;
         console.log(redirect_url);
@@ -222,7 +223,7 @@ function googleRedirect(req, res) {
         let user = yield (0, dbUsers_1.getUserByEmail)(email);
         // if it turns out that user has not been created, create one
         if (!user) {
-            user = yield (0, dbUsers_1.signUp)(email, null, type_1.UserProvider.GOOGLE);
+            user = yield (0, dbUsers_1.signUp)(email, null, type_1.UserProviderType.GOOGLE);
             // set google provided user data
             yield (0, dbUsers_1.editProfile)(Object.assign(Object.assign({}, user), { user_name: name, user_avatar_type: type_1.UserAvatarType.URL, user_avatar_content: picture }));
         }
@@ -241,7 +242,7 @@ function googleRedirect(req, res) {
             expiresIn: "1h",
         });
         const redirectQuery = {
-            user: JSON.stringify(user),
+            user: JSON.stringify(Object.assign(Object.assign({}, user), { password: null })),
             refresh_token,
             access_token,
         };

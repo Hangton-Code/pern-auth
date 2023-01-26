@@ -30,7 +30,7 @@ router.get("/me", checkAuth_1.default, (req, res) => {
     res.json({
         message: "success",
         body: {
-            user: req.user,
+            user: Object.assign(Object.assign({}, req.user), { password: null }),
         },
     });
 });

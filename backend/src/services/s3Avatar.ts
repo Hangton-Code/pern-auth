@@ -26,7 +26,6 @@ function getAvatarFileStream(fileKey: string) {
 }
 
 function deleteAvatar(fileKey: string) {
-  console.log(fileKey);
   const deleteParams = {
     Key: fileKey,
     Bucket: bucketName,

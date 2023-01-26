@@ -1,30 +1,27 @@
-import sgMail from "@sendgrid/mail";
-require("dotenv").config();
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
+import tansporter from "../nodemailer";
 
 function sendSignUpEmail(email: string, redirect_url: string) {
   const message = {
+    from: process.env.NODEMAILER_OUTLOOK_EMAIL as string,
     to: email,
-    from: process.env.SENDGRID_API_EMAIL as string,
     subject: "Welcome to Code-Hangton!",
-    text: "Thank You For Signing Up",
-    html: `<h1>Hello User, welcome to Code-Hangton. <a href="${redirect_url}">Click here</a> to continue the registration.</h1>`,
+    text: `Thank you for signing up. Link to continue the registration: ${redirect_url}`,
+    html: `<h1>Hello User, welcome to PERN-AUTH. <a href="${redirect_url}">Click here</a> to continue the registration.</h1>`,
   };
 
-  return sgMail.send(message);
+  return tansporter.sendMail(message);
 }
 
 function sendSetPasswordEmail(email: string, redirect_url: string) {
   const message = {
+    from: process.env.NODEMAILER_OUTLOOK_EMAIL as string,
     to: email,
-    from: process.env.SENDGRID_API_EMAIL as string,
-    subject: "Reset Your Password Here!",
-    text: "Thank You For Coming Back",
-    html: `<h1>Hello User, welcome back to Code-Hangton. <a href="${redirect_url}">Click here</a> to reset your password.</h1>`,
+    subject: "Set Your New Password Here!",
+    text: `Thank you for using PERN-AUTH. Link to set up your new password: ${redirect_url}`,
+    html: `<h1>Hello User, welcome back to PERN-AUTH. <a href="${redirect_url}">Click here</a> to reset your password.</h1>`,
   };
 
-  return sgMail.send(message);
+  return tansporter.sendMail(message);
 }
 
 export { sendSignUpEmail, sendSetPasswordEmail };

@@ -1,7 +1,7 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../AuthProvider";
-import { IUser } from "../../type";
+import { useAuth } from "../AuthProvider";
+import { IUser } from "../type";
 
 function GoogleRedirectPage() {
   const { search } = useLocation();

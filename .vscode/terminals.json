@@ -1,0 +1,25 @@
+{
+  "autorun": true,
+  "autokill": true,
+  "terminals": [
+    {
+      "name": "server typescript",
+      "open": true,
+      "commands": ["cd backend", "tsc -w"]
+    },
+    {
+      "name": "server api",
+      "open": true,
+      "commands": ["cd backend", "yarn dev"]
+    },
+    {
+      "name": "client react",
+      "open": true,
+      "commands": ["cd frontend", "yarn start"]
+    },
+    {
+      "name": "terminal",
+      "open": true
+    }
+  ]
+}

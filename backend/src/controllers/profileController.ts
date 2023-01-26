@@ -25,7 +25,6 @@ async function getProfileController(req: Request, res: Response) {
     },
   });
 }
-
 async function editProfileController(req: Request, res: Response) {
   await editProfile({
     ...req.user,
@@ -36,7 +35,6 @@ async function editProfileController(req: Request, res: Response) {
     message: "success",
   });
 }
-
 async function editAvatarController(req: Request, res: Response) {
   let requested_avatar_type: number = req.body.avatar_type;
   const file = req.file;
@@ -44,7 +42,7 @@ async function editAvatarController(req: Request, res: Response) {
   // to prevent file is uploaded but requesting to set other (0 or 1)
   if (file) requested_avatar_type = UserAvatarType.UPLOADED_IMAGE;
 
-  // if requested avatar type is not declared (0,1,2 => allowedUserAvatarType)
+  // if requested avatar type is not declared (0,1,2 => UserAvatarType)
   if (![0, 1, 2].includes(requested_avatar_type)) {
     throw new APIError("Avatar Type Is Not Declared", {
       statusCode: 400,
@@ -52,11 +50,14 @@ async function editAvatarController(req: Request, res: Response) {
   }
 
   // delete uploaded avatar
-  const user_avatar_type: number = req.user.user_avatar_type;
+  const user_avatar_type: UserAvatarType = req.user.user_avatar_type;
   if (user_avatar_type === UserAvatarType.UPLOADED_IMAGE) {
     const key: string = req.user.user_avatar_content;
     await deleteAvatar(key);
   }
+
+  // response value
+  let new_user_avatar_content: string | null = "";
 
   // set avatar
   switch (requested_avatar_type) {
@@ -66,6 +67,8 @@ async function editAvatarController(req: Request, res: Response) {
         user_avatar_type: UserAvatarType.DEFAULT,
         user_avatar_content: null,
       });
+
+      new_user_avatar_content = null;
 
       break;
     case UserAvatarType.URL:
@@ -81,6 +84,8 @@ async function editAvatarController(req: Request, res: Response) {
         user_avatar_type: UserAvatarType.URL,
         user_avatar_content: avatar_url,
       });
+
+      new_user_avatar_content = avatar_url;
 
       break;
     case UserAvatarType.UPLOADED_IMAGE:
@@ -99,14 +104,19 @@ async function editAvatarController(req: Request, res: Response) {
 
       await unlinkFile(file.path);
 
+      new_user_avatar_content = Key;
+
       break;
   }
 
   res.json({
     message: "success",
+    body: {
+      new_user_avatar_type: requested_avatar_type,
+      new_user_avatar_content,
+    },
   });
 }
-
 async function getAvatarController(req: Request, res: Response) {
   const Key = req.params.key;
 

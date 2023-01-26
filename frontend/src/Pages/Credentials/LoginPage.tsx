@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FormEvent, useState } from "react";
 import { useAuth } from "../../AuthProvider";
 
@@ -9,6 +9,7 @@ function LoginPage() {
   const [error, setError] = useState("");
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const onFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -111,7 +112,7 @@ function LoginPage() {
         {/* button */}
         <button
           type="submit"
-          className="hover:cursor-pointer h-10 px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:shadow-purple-300 hover:shadow-md transition-all active:scale-95 disabled:pointer-events-none disabled:opacity-60 flex justify-center"
+          className="hover:cursor-pointer h-10 px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:shadow-purple-300 hover:shadow-md transition-all active:scale-95 active:shadow-none disabled:pointer-events-none disabled:opacity-60 flex justify-center"
           disabled={!email || !password || !isPolicyAgreed || isLoading}
         >
           {isLoading ? (

@@ -1,5 +1,5 @@
 import db from "../db";
-import { IUser, UserProvider } from "../type";
+import { IUser, UserProviderType } from "../type";
 import bcrypt from "bcrypt";
 
 // for auth
@@ -34,7 +34,7 @@ async function signUp(
 
   const queryString =
     "insert into users (email, password, provider) values ($1, $2, $3) returning *";
-  const values = [email, processedPassword, provider || UserProvider.EMAIL];
+  const values = [email, processedPassword, provider || UserProviderType.EMAIL];
 
   return await db
     .query(queryString, values)
@@ -60,7 +60,7 @@ async function setPassword(password: string, id: string) {
 // for profile
 async function getProfileByIds(id: string[]) {
   const queryString = // in sql, rows = array, [] != array. And, id = array = rows. Therefore, ANY works, IN does not work
-    "select id, user_name, user_avatar_type, user_avatar_content from users where id = ANY($1)";
+    "select id, user_name, user_avatar_type, user_avatar_content, signuped_at from users where id = ANY($1)";
   const values = [id];
 
   return (await db.query(queryString, values)).rows as IUser[];

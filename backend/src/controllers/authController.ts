@@ -11,7 +11,7 @@ import { sendSetPasswordEmail, sendSignUpEmail } from "../services/email";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { getGoogleUser } from "../services/googleLogin";
-import { UserAvatarType, UserProvider } from "../type";
+import { UserAvatarType, UserProviderType } from "../type";
 import { signToken, verifyToken } from "../helpers/jwt";
 
 async function loginController(req: Request, res: Response) {
@@ -67,7 +67,10 @@ async function loginController(req: Request, res: Response) {
   res.json({
     message: "success",
     body: {
-      user,
+      user: {
+        ...user,
+        password: null,
+      },
       refresh_token,
       access_token,
     },
@@ -147,7 +150,10 @@ async function signupController(req: Request, res: Response) {
   res.json({
     message: "success",
     body: {
-      user,
+      user: {
+        ...user,
+        password: null,
+      },
       refresh_token,
       access_token,
     },
@@ -233,6 +239,7 @@ async function setPasswordEmailController(req: Request, res: Response) {
   const token = signToken(
     {
       id: user.id,
+      email,
     },
     process.env.JWT_TOKEN_SECRET_KEY as string,
     { expiresIn: "8d" }
@@ -278,7 +285,7 @@ async function googleRedirect(req: Request, res: Response) {
 
   // if it turns out that user has not been created, create one
   if (!user) {
-    user = await signUp(email, null, UserProvider.GOOGLE);
+    user = await signUp(email, null, UserProviderType.GOOGLE);
     // set google provided user data
     await editProfile({
       ...user,
@@ -314,7 +321,10 @@ async function googleRedirect(req: Request, res: Response) {
   );
 
   const redirectQuery = {
-    user: JSON.stringify(user),
+    user: JSON.stringify({
+      ...user,
+      password: null,
+    }),
     refresh_token,
     access_token,
   };

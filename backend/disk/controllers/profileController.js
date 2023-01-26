@@ -50,7 +50,7 @@ function editAvatarController(req, res) {
         // to prevent file is uploaded but requesting to set other (0 or 1)
         if (file)
             requested_avatar_type = type_1.UserAvatarType.UPLOADED_IMAGE;
-        // if requested avatar type is not declared (0,1,2 => allowedUserAvatarType)
+        // if requested avatar type is not declared (0,1,2 => UserAvatarType)
         if (![0, 1, 2].includes(requested_avatar_type)) {
             throw new errorHandler_1.APIError("Avatar Type Is Not Declared", {
                 statusCode: 400,
@@ -62,10 +62,13 @@ function editAvatarController(req, res) {
             const key = req.user.user_avatar_content;
             yield (0, s3Avatar_1.deleteAvatar)(key);
         }
+        // response value
+        let new_user_avatar_content = "";
         // set avatar
         switch (requested_avatar_type) {
             case type_1.UserAvatarType.DEFAULT:
                 yield (0, dbUsers_1.editProfile)(Object.assign(Object.assign({}, req.user), { user_avatar_type: type_1.UserAvatarType.DEFAULT, user_avatar_content: null }));
+                new_user_avatar_content = null;
                 break;
             case type_1.UserAvatarType.URL:
                 const avatar_url = req.body.avatar_url;
@@ -74,6 +77,7 @@ function editAvatarController(req, res) {
                         statusCode: 400,
                     });
                 yield (0, dbUsers_1.editProfile)(Object.assign(Object.assign({}, req.user), { user_avatar_type: type_1.UserAvatarType.URL, user_avatar_content: avatar_url }));
+                new_user_avatar_content = avatar_url;
                 break;
             case type_1.UserAvatarType.UPLOADED_IMAGE:
                 if (!file)
@@ -83,10 +87,15 @@ function editAvatarController(req, res) {
                 const { Key } = yield (0, s3Avatar_1.uploadAvatar)(file);
                 yield (0, dbUsers_1.editProfile)(Object.assign(Object.assign({}, req.user), { user_avatar_type: type_1.UserAvatarType.UPLOADED_IMAGE, user_avatar_content: Key }));
                 yield unlinkFile(file.path);
+                new_user_avatar_content = Key;
                 break;
         }
         res.json({
             message: "success",
+            body: {
+                new_user_avatar_type: requested_avatar_type,
+                new_user_avatar_content,
+            },
         });
     });
 }

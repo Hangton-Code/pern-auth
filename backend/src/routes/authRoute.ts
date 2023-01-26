@@ -74,7 +74,10 @@ router.get("/me", checkAuth, (req, res) => {
   res.json({
     message: "success",
     body: {
-      user: req.user,
+      user: {
+        ...req.user,
+        password: null,
+      },
     },
   });
 });

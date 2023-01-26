@@ -30,7 +30,7 @@ router.post(
   "/edit/avatar",
   checkAuth,
   upload(allowedAvatarExt, maxAvatarSize).single("image"),
-  body("avatar_type").optional().isNumeric().isIn([0, 1, 2]),
+  body("avatar_type").optional().toInt().isIn([0, 1, 2]),
   body("avatar_url").optional().isURL(),
   validationHandler,
   use(editAvatarController)

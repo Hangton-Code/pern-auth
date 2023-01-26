@@ -4,7 +4,7 @@ enum UserAvatarType {
   UPLOADED_IMAGE = 2,
 }
 
-enum UserProvider {
+enum UserProviderType {
   EMAIL = 0,
   GOOGLE = 1,
 }
@@ -15,9 +15,11 @@ interface IUser {
   password: string;
   refresh_token: string[];
   user_name: string;
-  user_avatar_type: number;
+  user_avatar_type: UserAvatarType;
   user_avatar_content?: string;
+  signuped_at: string;
+  provider: UserProviderType;
 }
 
-export { UserAvatarType, UserProvider };
+export { UserAvatarType, UserProviderType };
 export type { IUser };

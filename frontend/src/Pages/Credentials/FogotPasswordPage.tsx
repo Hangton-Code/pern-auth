@@ -2,18 +2,18 @@ import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../AuthProvider";
 
-function SignupEmailPage() {
+function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const { signupEmail } = useAuth();
+  const { setPasswordEmail } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const onFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setIsLoading(true);
-    signupEmail(email).then((err) => {
+    setPasswordEmail(email).then((err) => {
       setIsLoading(false);
       if (err) {
         setError(err);
@@ -33,10 +33,10 @@ function SignupEmailPage() {
       >
         <div className="flex flex-col">
           <span className="font-semibold text-3xl leading-relaxed text-slate-800">
-            Hi, There
+            Forgot Password?
           </span>
           <span className="text-sm text-slate-500">
-            Please enter your credentials to sign up
+            Please enter your in order to reset your password
           </span>
         </div>
 
@@ -67,7 +67,7 @@ function SignupEmailPage() {
           )}
           {success ? (
             <span className="text-sm font-medium text-green-500 indent-2">
-              Check your email inbox to continue the registration.
+              Check your email inbox to set a new password.
             </span>
           ) : (
             <></>
@@ -87,13 +87,13 @@ function SignupEmailPage() {
               alt=""
             />
           ) : (
-            "Start For Free"
+            "Confirm"
           )}
         </button>
 
         {/* Login */}
         <span className="leading-normal text-center text-slate-800 font-medium">
-          Already have an account?{" "}
+          Remeber the password?{" "}
           <Link to="/auth/credentials/login" className="text-purple-600">
             Log In
           </Link>
@@ -103,4 +103,4 @@ function SignupEmailPage() {
   );
 }
 
-export default SignupEmailPage;
+export default ForgotPasswordPage;
