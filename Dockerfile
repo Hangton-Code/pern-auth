@@ -14,5 +14,3 @@ COPY --from=client-build /frontend/build ./client
 EXPOSE 5000
 
 CMD ["npm", "run", "start"]
-
-# build by "docker build -t pern-auth-app:<version> ."

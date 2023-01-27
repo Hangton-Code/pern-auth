@@ -1,6 +1,6 @@
 # Introduction
 
-`PERN-AUTH` is a example web app that implements full authentication system based on PERN (PostgreSQL, Express, React, Node.js)
+`PERN-AUTH` is a example web app that implements **Full Authentication System** based on **PERN** (PostgreSQL, Express, React, Node.js)
 
 # Knowledge Involved
 
@@ -25,7 +25,7 @@
 
 - Run those [query command](/db-setup.sql) on your PostgreSQL Server to create a database and a table for storing users data
 - AWS s3 bucket setup reference: https://www.youtube.com/watch?v=NZElg91l_ms&t=360s
-- Google oauth setup reference: https://www.youtube.com/watch?v=Qt3KJZ2kQk0&t=1302s
+- Google OAuth setup reference: https://www.youtube.com/watch?v=Qt3KJZ2kQk0&t=1302s
 
 ### Required Environment Variable (`/backend/.env`)
 
@@ -67,7 +67,7 @@ At least 3 terminal is needed
 
 ### Docker
 
-we will simply integrate the backend and frontend by the [Dockerfile](/Dockerfile) and run with the [docker-compose.yml](/docker-compose.yml)
+we will simply **integrate the backend and frontend** by the [Dockerfile](/Dockerfile) and run with the [docker-compose.yml](/docker-compose.yml)
 
 1. build a docker image by `docker build -t pern-auth-app:1.0 .`
 2. edit the environment variable on the [docker compose file](/docker-compose.yml) as your preferences
