@@ -16,7 +16,7 @@ exports.googleRedirect = exports.setPasswordController = exports.setPasswordEmai
 const errorHandler_1 = require("../helpers/errorHandler");
 const dbUsers_1 = require("../services/dbUsers");
 const email_1 = require("../services/email");
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const googleLogin_1 = require("../services/googleLogin");
 const type_1 = require("../type");
 const jwt_1 = require("../helpers/jwt");
@@ -33,7 +33,7 @@ function loginController(req, res) {
                 statusCode: 400,
             });
         // verify password
-        const passwordVerificaionResult = yield bcrypt_1.default.compare(password, user.password); // plain password, hashed password on db
+        const passwordVerificaionResult = yield bcryptjs_1.default.compare(password, user.password); // plain password, hashed password on db
         if (!passwordVerificaionResult)
             throw new errorHandler_1.APIError("Invalid Password", {
                 statusCode: 400,
@@ -225,7 +225,8 @@ function googleRedirect(req, res) {
         if (!user) {
             user = yield (0, dbUsers_1.signUp)(email, null, type_1.UserProviderType.GOOGLE);
             // set google provided user data
-            yield (0, dbUsers_1.editProfile)(Object.assign(Object.assign({}, user), { user_name: name, user_avatar_type: type_1.UserAvatarType.URL, user_avatar_content: picture }));
+            user = Object.assign(Object.assign({}, user), { user_name: name, user_avatar_type: type_1.UserAvatarType.URL, user_avatar_content: picture });
+            yield (0, dbUsers_1.editProfile)(user);
         }
         // generate a refresh token and save it on db
         const refresh_token = (0, jwt_1.signToken)({

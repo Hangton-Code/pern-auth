@@ -1,6 +1,6 @@
 import db from "../db";
 import { IUser, UserProviderType } from "../type";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 // for auth
 async function getUserById(id: string) {

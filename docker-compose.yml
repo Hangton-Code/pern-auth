@@ -1,0 +1,40 @@
+version: "3"
+services:
+  app:
+    image: pern-auth-app:1.0
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      CLIENT_URL: http://localhost:5000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: admin
+      DB_NAME: pern-auth
+      JWT_TOKEN_SECRET_KEY:
+      JWT_ACCESS_TOKEN_SECRET_KEY:
+      JWT_REFRESH_TOKEN_SECRET_KEY:
+      AWS_REGION:
+      AWS_S3_BUCKET_NAME:
+      AWS_ACCESS_KEY_ID:
+      AWS_SECRET_ACCESS_KEY:
+      GOOGLE_OAUTH_CLIENT_ID:
+      GOOGLE_OAUTH_CLIENT_SECRET:
+      GOOGLE_OAUTH_REDIRECT_URI: http://localhost:5000/api/auth/google/redirect
+      NODEMAILER_OUTLOOK_EMAIL:
+      NODEMAILER_OUTLOOK_PASSWORD:
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "54321:5432"
+    volumes:
+      - pern-auth-db-data:/var/lib/postgresql/data
+volumes:
+  pern-auth-db-data:

@@ -9,7 +9,7 @@ import {
 } from "../services/dbUsers";
 import { sendSetPasswordEmail, sendSignUpEmail } from "../services/email";
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { getGoogleUser } from "../services/googleLogin";
 import { UserAvatarType, UserProviderType } from "../type";
 import { signToken, verifyToken } from "../helpers/jwt";
@@ -287,12 +287,13 @@ async function googleRedirect(req: Request, res: Response) {
   if (!user) {
     user = await signUp(email, null, UserProviderType.GOOGLE);
     // set google provided user data
-    await editProfile({
+    user = {
       ...user,
       user_name: name,
       user_avatar_type: UserAvatarType.URL,
       user_avatar_content: picture,
-    });
+    };
+    await editProfile(user);
   }
 
   // generate a refresh token and save it on db

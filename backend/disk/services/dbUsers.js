@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.editProfile = exports.getProfileByIds = exports.setPassword = exports.editRefreshToken = exports.signUp = exports.getUserByEmail = exports.getUserById = void 0;
 const db_1 = __importDefault(require("../db"));
 const type_1 = require("../type");
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 // for auth
 function getUserById(id) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -41,7 +41,7 @@ function getUserByEmail(email) {
 exports.getUserByEmail = getUserByEmail;
 function signUp(email, password, provider) {
     return __awaiter(this, void 0, void 0, function* () {
-        const processedPassword = password ? yield bcrypt_1.default.hash(password, 10) : null;
+        const processedPassword = password ? yield bcryptjs_1.default.hash(password, 10) : null;
         const queryString = "insert into users (email, password, provider) values ($1, $2, $3) returning *";
         const values = [email, processedPassword, provider || type_1.UserProviderType.EMAIL];
         return yield db_1.default
@@ -60,7 +60,7 @@ function editRefreshToken(refresh_token, id) {
 exports.editRefreshToken = editRefreshToken;
 function setPassword(password, id) {
     return __awaiter(this, void 0, void 0, function* () {
-        const processedPassword = yield bcrypt_1.default.hash(password, 10);
+        const processedPassword = yield bcryptjs_1.default.hash(password, 10);
         const queryString = "update users set password = $1 where id = $2";
         const values = [processedPassword, id];
         yield db_1.default.query(queryString, values);
