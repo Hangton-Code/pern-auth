@@ -15,8 +15,6 @@ import { UserAvatarType, UserProviderType } from "../type";
 import { signToken, verifyToken } from "../helpers/jwt";
 
 async function loginController(req: Request, res: Response) {
-  console.log(req.body);
-
   const email: string = req.body.email;
   const password: string = req.body.password;
 

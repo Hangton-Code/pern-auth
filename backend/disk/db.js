@@ -11,5 +11,8 @@ const db = new pg_1.Client({
 });
 db.connect(() => {
     console.log("Connected to PostgresSQL Database");
+    db.query("select 1 + 1").then((res) => {
+        console.log(res);
+    });
 });
 exports.default = db;

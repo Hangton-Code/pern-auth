@@ -10,7 +10,7 @@ services:
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: admin
-      DB_NAME: pern-auth
+      DB_NAME: postgres
       JWT_TOKEN_SECRET_KEY:
       JWT_ACCESS_TOKEN_SECRET_KEY:
       JWT_REFRESH_TOKEN_SECRET_KEY:
@@ -26,7 +26,8 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
   db:
     image: postgres:14
     environment:
@@ -35,6 +36,12 @@ services:
     ports:
       - "54321:5432"
     volumes:
+      - ./db-setup.sql:/docker-entrypoint-initdb.d/db-setup.sql
       - pern-auth-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 2
 volumes:
   pern-auth-db-data:

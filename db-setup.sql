@@ -1,6 +1,3 @@
--- create pern-auth database
-CREATE DATABASE "pern-auth";
-
 -- uuid modules
 CREATE EXTENSION "uuid-ossp";
 

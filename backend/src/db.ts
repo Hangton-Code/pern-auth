@@ -11,6 +11,9 @@ const db = new Client({
 
 db.connect(() => {
   console.log("Connected to PostgresSQL Database");
+  db.query("select 1 + 1").then((res) => {
+    console.log(res);
+  });
 });
 
 export default db;

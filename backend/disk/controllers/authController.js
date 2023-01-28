@@ -22,7 +22,6 @@ const type_1 = require("../type");
 const jwt_1 = require("../helpers/jwt");
 function loginController(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(req.body);
         const email = req.body.email;
         const password = req.body.password;
         // get user data from db
