@@ -70,7 +70,7 @@ At least 3 terminal is needed
 we will simply **integrate the backend and frontend** by the [Dockerfile](/Dockerfile) and run with the [docker-compose.yml](/docker-compose.yml)
 
 1. build a docker image by `docker build -t pern-auth-app:1.0 .`
-2. edit the environment variable on the [docker compose file](/docker-compose.yml) as your preferences
+2. edit carefully the environment variable in the [docker compose file](/docker-compose.yml) as your preferences
 3. run the docker compose by `docker-compose up -d`
 
 # The End
