@@ -9,7 +9,7 @@ RUN npm install --legacy-peer-deps && npm run build
 FROM node:18
 WORKDIR /app
 COPY /backend .
-RUN npm install && npm i bcrypt --unsafe-perm=true --allow-root --save
+RUN npm install
 COPY --from=client-build /frontend/build ./client
 EXPOSE 5000
 
